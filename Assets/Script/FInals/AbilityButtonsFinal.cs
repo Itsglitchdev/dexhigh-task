@@ -55,7 +55,7 @@ public class AbilityButtonsFinal : MonoBehaviour
 
             if (i < textObjects.Count)
             {
-                buttonTextMap[button] = textObjects[i]; 
+                buttonTextMap[button] = textObjects[i];
             }
             else
             {
@@ -240,10 +240,45 @@ public class AbilityButtonsFinal : MonoBehaviour
 
             currentButtonOrder[i].anchoredPosition = pos;
 
-            float normalizedAngle = (angle + 360f) % 360f;
-            // Debug.Log($"[AbilityButton {i}] Angle: {normalizedAngle:F2}°, Position: {pos}");
+            // Determine target size
+            Vector2 targetSize;
+
+            if (Mathf.Approximately(totalAngle, 230f))
+            {
+                if (i == 0 || i == count - 1)
+                    targetSize = new Vector2(60f, 60f);
+                else if (i == 1 || i == count - 2)
+                    targetSize = new Vector2(65f, 65f);
+                else
+                    targetSize = new Vector2(75f, 75f);
+            }
+            else
+            {
+                targetSize = new Vector2(75f, 75f);
+            }
+
+            // Start size animation
+            StartCoroutine(AnimateButtonSize(currentButtonOrder[i], targetSize, 0.3f));  // Duration can be tweaked
         }
     }
+
+    private IEnumerator AnimateButtonSize(RectTransform button, Vector2 targetSize, float duration)
+    {
+        Vector2 startSize = button.sizeDelta;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0, 1, elapsed / duration);
+            button.sizeDelta = Vector2.Lerp(startSize, targetSize, t);
+            yield return null;
+        }
+
+        button.sizeDelta = targetSize;
+    }
+
+
 
     private void UpdateCenterText()
     {
